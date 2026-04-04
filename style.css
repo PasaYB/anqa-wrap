@@ -1,0 +1,427 @@
+/* ─── Reset & Variables ─────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:   #f5f0e8;
+  --polar:   #faf7f2;
+  --sepia:   #c4a882;
+  --brown:   #5c3d2e;
+  --ink:     #2c1810;
+  --shadow:  rgba(44, 24, 16, 0.22);
+}
+
+html { scroll-behavior: auto; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  overflow-x: hidden;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* Grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ─── Intro Screen ──────────────────────────────────── */
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.intro-inner { max-width: 580px; padding: 2rem; }
+
+.intro-title {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+  /* initial states set by GSAP to avoid CSS/GSAP transform conflicts */
+}
+
+.intro-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.5vw, 1.45rem);
+  color: var(--brown);
+  margin-top: 1.3rem;
+  line-height: 1.65;
+}
+
+.intro-hint {
+  font-family: 'Caveat', cursive;
+  font-size: 1.05rem;
+  color: var(--sepia);
+  margin-top: 2.4rem;
+  letter-spacing: 0.06em;
+}
+
+/* ─── Scene & Track ─────────────────────────────────── */
+#scene {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.timeline-track {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  height: 100vh;
+  position: relative;
+  will-change: transform;
+  width: max-content;
+  min-width: 100%;   
+}
+
+/* The sepia line */
+.timeline-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: var(--sepia);
+  transform: translateY(-50%);
+  transform-origin: left center;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 1%, black 99%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 1%, black 99%, transparent 100%);
+}
+
+/* ─── Chapter ───────────────────────────────────────── */
+.chapter {
+  position: relative;
+  width: 680px;
+  flex-shrink: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chapter:first-child { padding-left: 60px; }
+.chapter:last-child  { padding-right: 120px; }
+
+/* ─── Chapter Marker ────────────────────────────────── */
+.chapter-marker {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.marker-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.marker-era {
+  font-family: 'Caveat', cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--brown);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.marker-year {
+  font-family: 'Caveat', cursive;
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: var(--sepia);
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.marker-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--brown);
+  border: 2.5px solid var(--sepia);
+  position: relative;
+  z-index: 2;
+  transform: scale(0.6);
+  opacity: 0;
+
+}
+
+.marker-dot::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1px solid var(--sepia);
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.dot-pulse::before {
+  animation: dotPulse 2.2s ease-out infinite;
+}
+
+@keyframes dotPulse {
+  0%   { opacity: 0.7; transform: scale(0.5); }
+  100% { opacity: 0;   transform: scale(2.8); }
+}
+
+.marker-bottom {
+  margin-top: 34px;
+  width: 230px;
+  text-align: center;
+}
+
+.marker-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--brown);
+  line-height: 1.6;
+  opacity: 0.88;
+}
+
+/* ─── Polaroids (Desktop) ───────────────────────────── */
+.polaroid {
+  position: absolute;
+  width: 180px;
+  background: var(--polar);
+  padding: 10px 10px 38px;
+  box-shadow:
+    0 3px 10px rgba(44,24,16,.15),
+    0 8px 24px rgba(44,24,16,.10);
+  transform: rotate(var(--rot, 0deg));
+  cursor: pointer;
+  transition:
+    transform 0.38s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.38s ease;
+  z-index: 5;
+  opacity: 0;
+}
+
+.polaroid:hover {
+  transform: rotate(calc(var(--rot, 0deg) * 0.35)) translateY(-7px) scale(1.04);
+  box-shadow:
+    0 14px 36px rgba(44,24,16,.26),
+    0 4px 12px rgba(44,24,16,.14);
+  z-index: 20;
+}
+
+.polaroid-photo {
+  width: 100%;
+  aspect-ratio: 1 / 0.88;
+  /* display: block; */
+  /* height: auto */
+  background-color: gray;
+}
+
+img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 0.88;
+  object-fit: cover;
+
+}
+
+.polaroid-caption {
+  font-family: 'Caveat', cursive;
+  font-size: 0.82rem;
+  color: var(--brown);
+  text-align: center;
+  margin-top: 8px;
+  line-height: 1.35;
+  padding: 0 2px;
+}
+
+/* ─── Polaroid Gradients ────────────────────────────── */
+.g1  { background: linear-gradient(135deg, #d4b896 0%, #9b7248 42%, #5c3d2e 100%); }
+.g2  { background: linear-gradient(160deg, #e8d0a0 0%, #c4a060 38%, #7d5030 100%); }
+.g3  { background: linear-gradient(120deg, #b89868 0%, #7d5538 52%, #4a2c1a 100%); }
+.g4  { background: linear-gradient(145deg, #dcc498 0%, #b09060 42%, #7d5840 100%); }
+.g5  { background: linear-gradient(130deg, #c8a870 0%, #9b7248 46%, #5c3428 100%); }
+.g6  { background: linear-gradient(155deg, #e0c890 0%, #c8a060 32%, #8b5c30 100%); }
+.g7  { background: linear-gradient(110deg, #c4a080 0%, #8b6040 52%, #4a2c18 100%); }
+.g8  { background: linear-gradient(140deg, #d8b090 0%, #a87050 42%, #6b3828 100%); }
+.g9  { background: radial-gradient(ellipse at 30% 30%, #e8d0a0 0%, #c4a060 42%, #7d5030 100%); }
+.g10 { background: linear-gradient(125deg, #d09870 0%, #c08058 42%, #7a4430 100%); }
+.g11 { background: linear-gradient(165deg, #c8b090 0%, #9b8060 46%, #5c3828 100%); }
+.g12 { background: linear-gradient(135deg, #e4c8a0 0%, #c0985a 38%, #7a5030 100%); }
+.g13 { background: linear-gradient(150deg, #b89060 0%, #8b6840 48%, #503820 100%); }
+.g14 { background: linear-gradient(115deg, #d0c090 0%, #b09860 42%, #7a6040 100%); }
+.g15 { background: radial-gradient(ellipse at 70% 60%, #d4c090 0%, #a07848 40%, #604030 100%); }
+
+/* September 2025 */
+#sep {
+  .p1 { top: 7%;   left: 6%;   }
+  .p2 { top: 9%;   right: 4%; }
+  .p3 { bottom: 8%;  left: 18%; }
+  .p4 { bottom: 13%;  left: 58%; }
+  .p5 { top: 15%;  left: 39%; }
+}
+
+
+/* Oktober 2025 */
+#okt {
+  .p1 { top: 5%;   left: 10%;  }
+  .p2 { top: 8%;  right: 3%;  }
+  .p3 { bottom: 7%; left: 7%;  }
+  .p4 { bottom: 11%; right: 35%; }
+  .p5 { top: 15%;  left: 39%; }
+  .p6 { bottom: 9%;  right: 4%; }
+ }
+
+/* Desember 2025 */
+#nov {
+  .p1 { top: 5%;   left: 10%;  }
+  .p2 { top: 12%;  right: 7%;  }
+  .p3 { bottom: 12%; left: 7%;  }
+  .p4 { bottom: 11%; right: 8%; }
+  .p5 { top: 15%;  left: 37%; }
+  .p6 { bottom: 10%;  right: 37%; }
+}
+
+/* Januari 2026 */
+
+/* Desember 2026 */
+#des {
+  .p1 { top: 5%;   left: 14%;  }
+  .p2 { top: 7%;   right: 6%;  }
+  .p3 { top: 13%;  left: 41%;}
+  .p4 { bottom: 6%;  left: 8%;  }
+  .p5 { bottom: 10%; right: 10%; }
+  .p6 { bottom: 10%;  right: 37%; }
+}
+
+/* Februari 2026 */
+#febr {
+  .p1 { top: 8%;   left: 12%;  }
+  .p2 { top: 10%;  right: 8%;  }
+  .p3 { bottom: 9%; left: 22%;  }
+  .p4 { bottom: 7%; right: 15%; }
+  .p5 { top: 13%;  left: 39% }
+}
+
+/* Maret 2026 */
+#mar {
+  .p1 { top: 8%;   left: 12%;  }
+  .p2 { top: 10%;  right: 8%;  }
+  .p3 { bottom: 9%; left: 24%;  }
+  .p4 { bottom: 7%; right: 20%; }
+  .p5 { top: 13%;  left: 39% }
+}
+
+
+/* ─── Tablet Layout (768–1024px) ───────────────────── */
+@media (max-width: 1024px) {
+
+  /* Kill horizontal track */
+  .timeline-track {
+    flex-direction: column;
+    height: auto;
+    align-items: stretch;
+  }
+
+  .timeline-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    right: auto;
+    width: 1.5px;
+    height: auto;
+    transform: translateX(-50%);
+    transform-origin: top center;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 3%, black 97%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 3%, black 97%, transparent 100%);
+  }
+
+  .chapter {
+    width: 100%;
+    height: auto;
+    min-height: unset;
+    flex-direction: column;
+    padding: 80px 20px 60px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .chapter:first-child { padding-top: 80px; padding-left: 20px; }
+  .chapter:last-child  { padding-right: 20px; }
+
+  .chapter-marker {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 40px;
+  }
+
+  /* Reset all absolute polaroid positions */
+  .polaroid {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin-left: 0 !important;
+  }
+
+  /* Polaroid container becomes a flowing grid */
+  .polaroids-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  /* Tablet: alternate left/right */
+  .chapter:nth-child(odd)  .polaroids-wrap { justify-content: flex-start; padding-left: 10%; }
+  .chapter:nth-child(even) .polaroids-wrap { justify-content: flex-end;   padding-right: 10%; }
+}
+
+/* ─── Mobile Layout (<768px) ────────────────────────── */
+@media (max-width: 767px) {
+  .timeline-track {
+    width: 100%;
+  }
+  .timeline-line { display: none; }
+
+  .chapter {
+    padding: 60px 14px 50px;
+  }
+
+  .chapter:nth-child(odd)  .polaroids-wrap,
+  .chapter:nth-child(even) .polaroids-wrap {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .polaroid { width: 155px; }
+
+  .marker-era  { font-size: 0.95rem; }
+  .marker-year { font-size: 0.82rem; }
+  .marker-desc { font-size: 0.87rem; }
+  .polaroid-caption { font-size: 0.77rem; }
+
+  .intro-hint { display: none; }
+}
